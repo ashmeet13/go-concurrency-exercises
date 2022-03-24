@@ -12,7 +12,11 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time" // <!!>Added this Line for time.Tick
 )
+
+// <!!>Seting the rate limiter to once every second
+var limiter = time.Tick(time.Second)
 
 // Crawl uses `fetcher` from the `mockfetcher.go` file to imitate a
 // real crawler. It crawls until the maximum depth has reached.
@@ -35,6 +39,9 @@ func Crawl(url string, depth int, wg *sync.WaitGroup) {
 	for _, u := range urls {
 		// Do not remove the `go` keyword, as Crawl() must be
 		// called concurrently
+		//<!!> Set the ticker reciever here for the limiter to stop it from
+		// crawling concurrently in less than 1 second
+		<-limiter
 		go Crawl(u, depth-1, wg)
 	}
 	return
