@@ -17,31 +17,21 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 func main() {
-	// Create a process
-	proc := MockProcess{}
-
-	interrupt := make(chan os.Signal, 2)
-	signal.Notify(interrupt, os.Interrupt)
-
-	go func() {
-		flag := false
-		for {
-			<-interrupt
-			fmt.Println()
-			if flag {
-				fmt.Println("Exit")
-				os.Exit(1)
-			}
-			fmt.Println("Interrupted")
-			fmt.Println("Press Ctrl-C one more time to exit")
-			flag = true
-			proc.Stop()
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, syscall.SIGINT)
+	count := 0
+	for signal := range interrupt {
+		fmt.Println()
+		count += 1
+		if count == 1 {
+			fmt.Println("Ctrl + C, Stopping Process...")
+		} else if count == 2 {
+			fmt.Printf("Here")
+			os.Exit(0)
 		}
-	}()
-
-	// Run the process (blocking)
-	proc.Run()
+	}
 }
