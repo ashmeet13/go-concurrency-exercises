@@ -38,7 +38,7 @@ func main() {
 			fmt.Println("Interrupted")
 			fmt.Println("Press Ctrl-C one more time to exit")
 			flag = true
-			proc.Stop()
+			go proc.Stop()
 		}
 	}()
 
