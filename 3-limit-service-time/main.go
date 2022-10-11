@@ -11,7 +11,6 @@
 package main
 
 import (
-	"sync"
 	"time"
 )
 
@@ -21,7 +20,6 @@ type User struct {
 	ID        int
 	IsPremium bool
 	TimeUsed  int64 // in seconds
-	mu        sync.Mutex
 }
 
 func start(process func(), done chan bool) {
@@ -33,15 +31,14 @@ func start(process func(), done chan bool) {
 // if process had to be killed
 func HandleRequest(process func(), u *User) bool {
 	done := make(chan bool)
-	start(process, done)
+	go start(process, done)
+	requesttime := 
 	for {
 		select {
 		case <-done:
 			return true
 		case <-time.Tick(time.Second * 1):
-			u.mu.Lock()
-			defer u.mu.Unlock()
-			u.TimeUsed++
+			requesttime += 1
 			if u.TimeUsed > 10 && !u.IsPremium {
 				return false
 			}
